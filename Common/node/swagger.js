@@ -357,7 +357,10 @@ function addMethod(app, callback, spec) {
         }), 403);
       } else {
         try {
-          callback(req, res);
+          function throwAsync(asyncError) {
+              errorHandler(req, res, asyncError);
+          };
+          callback(req, res, throwAsync);
         } catch (error) {
           if (typeof errorHandler === "function") {
             errorHandler(req, res, error);
