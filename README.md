@@ -72,14 +72,18 @@ var findById = {
     "errorResponses" : [swagger.errors.invalid('id'), swagger.errors.notFound('pet')],
     "nickname" : "getPetById"
   },
-  'action': function (req,res) {
+  'action': function (req,res,next) {
     if (!req.params.petId) {
-      throw swagger.errors.invalid('id'); }
+      return next(swagger.errors.invalid('id'));
+    }
     var id = parseInt(req.params.petId);
     var pet = petData.getPetById(id);
 
-    if(pet) res.send(JSON.stringify(pet));
-    else throw swagger.errors.notFound('pet');
+    if(pet) {
+      res.send(JSON.stringify(pet));
+    } else {
+      return next(swagger.errors.notFound('pet'));
+    }
   }
 };
 

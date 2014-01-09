@@ -32,9 +32,9 @@ var allModels = {};
 
 // Default error handler
 var errorHandler = function (req, res, error) {
-  if (error.code && error.message)
+  if (error.code && error.message) {
     res.send(JSON.stringify(error), error.code);
-  else {
+  } else {
     console.error(req.method + " failed for path '" + require('url').parse(req.url).href + "': " + error);
     res.send(JSON.stringify({
       "message": "unknown error",
@@ -388,7 +388,7 @@ function addMethod(app, callback, spec) {
           callback(req, res, next);
         } catch (error) {
           if (typeof errorHandler === "function") {
-            errorHandler(req, res, error);
+            next(error, req, res);
           } else {
             throw error;
           }
@@ -405,6 +405,10 @@ function addMethod(app, callback, spec) {
 
 function setAppHandler(app) {
   appHandler = app;
+  app.use(app.router);
+  app.use(function(err, req, res, next) {
+      errorHandler(req, res, err, next);
+  });
 }
 
 // Change error handler
